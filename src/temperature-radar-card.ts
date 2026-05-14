@@ -156,11 +156,18 @@ export class TemperatureRadarCard extends LitElement {
     }
   }
 
+  private _chartLoading = false;
+
   private async _initChart(): Promise<void> {
+    if (this._chartLoading) return;
+    this._chartLoading = true;
     try {
       await loadAmCharts();
       const container = this.shadowRoot?.getElementById('chart-container');
       if (!container) return;
+      if (this._chartManager) {
+        this._chartManager.dispose();
+      }
       this._chartManager = new RadarChartManager(this._config);
       this._chartManager.create(container);
       this._chartReady = true;
@@ -169,6 +176,8 @@ export class TemperatureRadarCard extends LitElement {
       }
     } catch (e: any) {
       this._error = `Failed to load chart library: ${e.message}`;
+    } finally {
+      this._chartLoading = false;
     }
   }
 
@@ -242,7 +251,7 @@ export class TemperatureRadarCard extends LitElement {
           (stateObj.attributes.friendly_name as string) ||
           entityCfg.entity;
 
-        const matchingTemp = temps.find((t) => t.room.startsWith(roomName));
+        const matchingTemp = temps.find((t) => t.room.split('\n')[0] === roomName);
         humidity.push({
           room: matchingTemp ? matchingTemp.room : roomName,
           humidity: value,

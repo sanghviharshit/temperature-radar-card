@@ -21,7 +21,7 @@ export function loadAmCharts(): Promise<void> {
               `script[src="${src}"]`
             ) as HTMLScriptElement | null;
             if (existing) {
-              if (existing.dataset.loaded === 'true') {
+              if (existing.dataset.loaded === 'true' || (window as any).am5) {
                 resolve();
               } else {
                 existing.addEventListener('load', () => resolve());
@@ -42,7 +42,10 @@ export function loadAmCharts(): Promise<void> {
           })
       ),
     Promise.resolve()
-  );
+  ).catch((err) => {
+    amchartsLoadPromise = null;
+    throw err;
+  });
 
   return amchartsLoadPromise;
 }
