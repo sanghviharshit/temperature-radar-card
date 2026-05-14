@@ -2,7 +2,7 @@
 
 A custom Home Assistant Lovelace card that displays temperature data from multiple rooms as a radar (spider) chart using amCharts 5.
 
-![Temperature Radar Card](https://raw.githubusercontent.com/sanghviharshit/temperature-radar-card/main/screenshots/preview.png)
+![Temperature Radar Card](./screenshots/preview.png)
 
 ## Features
 
