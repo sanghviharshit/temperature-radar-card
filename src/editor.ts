@@ -227,16 +227,6 @@ export class TemperatureRadarCardEditor extends LitElement {
                 )}
             ></ha-switch>
           </ha-formfield>
-          <ha-formfield label="Show trend arrows">
-            <ha-switch
-              .checked=${this._config.show_trends !== false}
-              @change=${(e: Event) =>
-                this._valueChanged(
-                  'show_trends',
-                  (e.target as HTMLInputElement).checked
-                )}
-            ></ha-switch>
-          </ha-formfield>
           <ha-formfield label="Show last updated">
             <ha-switch
               .checked=${this._config.show_last_updated !== false}

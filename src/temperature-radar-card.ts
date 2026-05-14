@@ -25,7 +25,6 @@ export class TemperatureRadarCard extends LitElement {
 
   private _hass?: HomeAssistant;
   private _chartManager: RadarChartManager | null = null;
-  private _previousTemperatures: Map<string, number> = new Map();
   private _previousStates: Map<string, string> = new Map();
   private _lastUpdated: Date | null = null;
   private _timestampInterval: ReturnType<typeof setInterval> | null = null;
@@ -124,7 +123,6 @@ export class TemperatureRadarCard extends LitElement {
 
   connectedCallback(): void {
     super.connectedCallback();
-    this._loadPreviousTemperatures();
     this._timestampInterval = setInterval(() => {
       this._updateTimestamp();
     }, 60000);
@@ -140,37 +138,6 @@ export class TemperatureRadarCard extends LitElement {
       this._chartManager.dispose();
       this._chartManager = null;
       this._chartReady = false;
-    }
-  }
-
-  private _storageKey(): string {
-    const entityIds = this._config.entities.map((e) => e.entity).join(',');
-    return `temperature-radar-card:${entityIds}`;
-  }
-
-  private _loadPreviousTemperatures(): void {
-    try {
-      const stored = localStorage.getItem(this._storageKey());
-      if (stored) {
-        const data = JSON.parse(stored) as Record<string, number>;
-        for (const [key, value] of Object.entries(data)) {
-          this._previousTemperatures.set(key, value);
-        }
-      }
-    } catch {
-      // ignore parse errors
-    }
-  }
-
-  private _savePreviousTemperatures(): void {
-    try {
-      const data: Record<string, number> = {};
-      for (const [key, value] of this._previousTemperatures) {
-        data[key] = value;
-      }
-      localStorage.setItem(this._storageKey(), JSON.stringify(data));
-    } catch {
-      // ignore quota errors
     }
   }
 
@@ -247,16 +214,7 @@ export class TemperatureRadarCard extends LitElement {
 
       let label = roomName;
       if (this._config.show_values) {
-        let valueStr = `${Math.round(converted * 10) / 10}${unitSuffix}`;
-        if (this._config.show_trends) {
-          const prev = this._previousTemperatures.get(entityCfg.entity);
-          if (prev !== undefined) {
-            const diff = converted - prev;
-            if (diff > 0.1) valueStr += ' ▲';
-            else if (diff < -0.1) valueStr += ' ▼';
-          }
-        }
-        label += '\n' + valueStr;
+        label += '\n' + `${Math.round(converted * 10) / 10}${unitSuffix}`;
       }
 
       temps.push({
@@ -266,7 +224,6 @@ export class TemperatureRadarCard extends LitElement {
         unit_of_measurement: toUnit,
       });
 
-      this._previousTemperatures.set(entityCfg.entity, converted);
       this._previousStates.set(entityCfg.entity, stateObj.state);
     }
 
@@ -299,7 +256,6 @@ export class TemperatureRadarCard extends LitElement {
       this._lastUpdated = new Date();
       this._chartManager?.updateData(temps, humidity);
       this._updateTimestamp();
-      this._savePreviousTemperatures();
     }
   }
 

@@ -15,7 +15,6 @@ export interface TemperatureRadarCardConfig {
   humidity_color?: string;
   colored_bullets?: boolean;
   show_values?: boolean;
-  show_trends?: boolean;
   show_last_updated?: boolean;
   stale_threshold?: number;
   threshold_low?: number | null;

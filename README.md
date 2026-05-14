@@ -11,7 +11,6 @@ A custom Home Assistant Lovelace card that displays temperature data from multip
 - Temperature unit conversion (Celsius/Fahrenheit)
 - Color-coded data points based on temperature (blue to red gradient)
 - Threshold highlighting for out-of-range temperatures
-- Trend indicators (up/down arrows) when temperature changes
 - "Last updated" timestamp with stale data warning
 - Optional chart rotation animation
 - Visual card editor with entity pickers
@@ -78,7 +77,6 @@ chart_color: "#808080"
 humidity_color: "#4488cc"
 colored_bullets: true
 show_values: true
-show_trends: true
 show_last_updated: true
 stale_threshold: 10
 threshold_low: 18
@@ -104,7 +102,6 @@ max_value: null
 | `humidity_color` | string | `#4488cc` | Humidity series color |
 | `colored_bullets` | boolean | `false` | Color data points by temperature |
 | `show_values` | boolean | `true` | Show temperature values on labels |
-| `show_trends` | boolean | `true` | Show trend arrows when temperature changes |
 | `show_last_updated` | boolean | `true` | Show "Updated X min ago" below chart |
 | `stale_threshold` | number | `10` | Minutes before data is considered stale |
 | `threshold_low` | number | `null` | Temperatures below this are highlighted |

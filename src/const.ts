@@ -19,7 +19,6 @@ export const DEFAULT_CONFIG: Partial<TemperatureRadarCardConfig> = {
   humidity_color: '#4488cc',
   colored_bullets: false,
   show_values: true,
-  show_trends: true,
   show_last_updated: true,
   stale_threshold: 10,
   threshold_low: null,
