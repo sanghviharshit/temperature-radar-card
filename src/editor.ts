@@ -155,8 +155,11 @@ export class TemperatureRadarCardEditor extends LitElement {
           <ha-select
             label="Units"
             .value=${this._config.units || 'celsius'}
-            @selected=${(e: CustomEvent) =>
-              this._valueChanged('units', (e.target as any).value)}
+            @selected=${(e: CustomEvent) => {
+              const target = e.target as any;
+              if (target.value) this._valueChanged('units', target.value);
+            }}
+            @closed=${(e: Event) => e.stopPropagation()}
           >
             <mwc-list-item value="celsius">Celsius</mwc-list-item>
             <mwc-list-item value="fahrenheit">Fahrenheit</mwc-list-item>

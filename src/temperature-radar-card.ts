@@ -97,11 +97,34 @@ export class TemperatureRadarCard extends LitElement {
         }
       }
     }
+    const oldConfig = this._config;
     this._config = structuredClone({ ...DEFAULT_CONFIG, ...config }) as TemperatureRadarCardConfig;
+
+    if (oldConfig && this._chartReady) {
+      const needsRebuild =
+        oldConfig.units !== this._config.units ||
+        oldConfig.chart_color !== this._config.chart_color ||
+        oldConfig.humidity_color !== this._config.humidity_color ||
+        oldConfig.min_value !== this._config.min_value ||
+        oldConfig.max_value !== this._config.max_value ||
+        oldConfig.colored_bullets !== this._config.colored_bullets ||
+        oldConfig.threshold_low !== this._config.threshold_low ||
+        oldConfig.threshold_high !== this._config.threshold_high ||
+        oldConfig.rotate_chart !== this._config.rotate_chart ||
+        JSON.stringify(oldConfig.entities) !== JSON.stringify(this._config.entities) ||
+        JSON.stringify(oldConfig.humidity_entities) !== JSON.stringify(this._config.humidity_entities);
+
+      if (needsRebuild) {
+        this._chartReady = false;
+        this._previousStates.clear();
+        this.requestUpdate();
+      }
+    }
   }
 
   connectedCallback(): void {
     super.connectedCallback();
+    this._loadPreviousTemperatures();
     this._timestampInterval = setInterval(() => {
       this._updateTimestamp();
     }, 60000);
@@ -120,6 +143,37 @@ export class TemperatureRadarCard extends LitElement {
     }
   }
 
+  private _storageKey(): string {
+    const entityIds = this._config.entities.map((e) => e.entity).join(',');
+    return `temperature-radar-card:${entityIds}`;
+  }
+
+  private _loadPreviousTemperatures(): void {
+    try {
+      const stored = localStorage.getItem(this._storageKey());
+      if (stored) {
+        const data = JSON.parse(stored) as Record<string, number>;
+        for (const [key, value] of Object.entries(data)) {
+          this._previousTemperatures.set(key, value);
+        }
+      }
+    } catch {
+      // ignore parse errors
+    }
+  }
+
+  private _savePreviousTemperatures(): void {
+    try {
+      const data: Record<string, number> = {};
+      for (const [key, value] of this._previousTemperatures) {
+        data[key] = value;
+      }
+      localStorage.setItem(this._storageKey(), JSON.stringify(data));
+    } catch {
+      // ignore quota errors
+    }
+  }
+
   protected shouldUpdate(changedProps: PropertyValues): boolean {
     if (changedProps.has('_config') || changedProps.has('_error')) return true;
     return false;
@@ -127,6 +181,12 @@ export class TemperatureRadarCard extends LitElement {
 
   protected firstUpdated(_changedProps: PropertyValues): void {
     this._initChart();
+  }
+
+  protected updated(changedProps: PropertyValues): void {
+    if (changedProps.has('_config') && !this._chartReady) {
+      this._initChart();
+    }
   }
 
   private async _initChart(): Promise<void> {
@@ -239,6 +299,7 @@ export class TemperatureRadarCard extends LitElement {
       this._lastUpdated = new Date();
       this._chartManager?.updateData(temps, humidity);
       this._updateTimestamp();
+      this._savePreviousTemperatures();
     }
   }
 
