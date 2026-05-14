@@ -301,10 +301,11 @@ export class TemperatureRadarCardEditor extends LitElement {
         </div>
 
         <div class="section">
-          <h3>Axis</h3>
+          <h3>Axis Range</h3>
+          <p class="helper-text">Set fixed min/max for the Y axis. Leave empty for auto-scaling.</p>
           <div class="side-by-side">
             <ha-textfield
-              label="Min value (auto if empty)"
+              label="Min value"
               type="number"
               .value=${String(this._config.min_value ?? '')}
               @input=${(e: Event) => {
@@ -313,7 +314,7 @@ export class TemperatureRadarCardEditor extends LitElement {
               }}
             ></ha-textfield>
             <ha-textfield
-              label="Max value (auto if empty)"
+              label="Max value"
               type="number"
               .value=${String(this._config.max_value ?? '')}
               @input=${(e: Event) => {
@@ -371,6 +372,11 @@ export class TemperatureRadarCardEditor extends LitElement {
     }
     mwc-button {
       margin-top: 8px;
+    }
+    .helper-text {
+      margin: 0 0 8px;
+      font-size: 0.85em;
+      color: var(--secondary-text-color);
     }
     label {
       display: block;
